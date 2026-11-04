@@ -63,14 +63,12 @@ public class PlayerController : MonoBehaviour
         Vector3 forwardMovement = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
         
-        // Lưu vận tốc Y hiện tại trước khi ghi đè moveDirection
         float currentY = moveDirection.y;
 
         Vector2 newSpeed = new Vector2(moveVector.y * currentMoveSpeed, moveVector.x * currentMoveSpeed);
 
         moveDirection = (forwardMovement * newSpeed.x) + (right * newSpeed.y);
 
-        // Nhảy nếu đang chạm đất và có yêu cầu nhảy, ngược lại giữ vận tốc Y cũ
         moveDirection.y = (jumped && characterController.isGrounded) ? jumpForce : currentY;
 
         if(!characterController.isGrounded) 
