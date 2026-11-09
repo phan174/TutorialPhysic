@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 1723491500816375623}
   - component: {fileID: 2342705736540938342}
   - component: {fileID: 5259503933908604425}
-  - component: {fileID: 928364153322290797}
   m_Layer: 0
   m_Name: Part
   m_TagString: Player
@@ -143,49 +142,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!144 &928364153322290797
-CharacterJoint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3940493134396769370}
-  serializedVersion: 3
-  m_ConnectedBody: {fileID: 0}
-  m_ConnectedArticulationBody: {fileID: 0}
-  m_Anchor: {x: 0, y: 0.99999994, z: 0}
-  m_Axis: {x: 0, y: 1, z: 0}
-  m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: 0, z: 0}
-  m_SwingAxis: {x: 1, y: 0, z: 1}
-  m_TwistLimitSpring:
-    spring: 1
-    damper: 1
-  m_LowTwistLimit:
-    limit: -45
-    bounciness: 0
-    contactDistance: 5
-  m_HighTwistLimit:
-    limit: 45
-    bounciness: 0
-    contactDistance: 5
-  m_SwingLimitSpring:
-    spring: 1
-    damper: 1
-  m_Swing1Limit:
-    limit: 140
-    bounciness: 0
-    contactDistance: 5
-  m_Swing2Limit:
-    limit: 140
-    bounciness: 0
-    contactDistance: 5
-  m_EnableProjection: 0
-  m_ProjectionDistance: 0.1
-  m_ProjectionAngle: 180
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
