@@ -85,7 +85,9 @@ Do not touch: `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.slnx
 - `PlayerController` (`Player.cs`): walk, sprint, jump, mouse look. Note: class name differs from file name.
 - `RaycastSystem`: casts a ray from the camera center using `Physics.RaycastNonAlloc` and calls the `IRaycastTarget` interface (`OnRaycastEnter` / `OnRaycastExit` / `OnRaycastInteract`).
 - `RaycastHighlight`: example target; changes color when looked at, gets pushed when clicked.
-- `PendulumScript`: damped pendulum with a `Push()` method.
+- `Pendulum` (abstract, implements `IRaycastTarget`): owns configuration (`stringLength`, `releaseAngle`, `damping`), shared state (`Angle`, `AngularVelocity`, step-counted `SimulatedTime`), the visual update, period measurement (`MeasuredPeriod` vs `TheoreticalPeriod`) and click interaction (`Release()` / `Reset()`). Subclasses implement only `Step(double dt)`. Subclasses must **not** define `FixedUpdate`. Kept deliberately small for learning; add hooks only when a subclass needs them.
+- `MathPendulum : Pendulum` (sealed): reference implementation, semi-implicit Euler in `double` with configurable sub-steps.
+- Planned: `PhysicsPendulum : Pendulum` using `Rigidbody` + `HingeJoint` with the determinism fixes.
 
 ## OOP principles (mandatory)
 
@@ -123,8 +125,7 @@ All code in this project **must** follow the four pillars of OOP. When writing o
 - In Unity, override `MonoBehaviour` lifecycle methods in subclasses by making the base one `protected virtual` (e.g. `protected virtual void Awake()`) and calling `base.Awake()` in the override.
 
 ### Known violations to fix
-- `PendulumScript`: public fields (`speed`, `initialAngle`, `damping`, `randomStart`) break encapsulation; `Push()` overwrites the `initialAngle` configuration. It also uses an arbitrary `speed` instead of computing the period from string length (see Physics rules above).
-- `RaycastHighlight`: checks for the concrete `PendulumScript` type and reads its public field instead of relying on `IRaycastTarget`.
+- `Player.cs`: class is named `PlayerController`, so the file name does not match the class name.
 
 ## Code conventions
 

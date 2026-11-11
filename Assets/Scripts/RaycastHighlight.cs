@@ -1,11 +1,14 @@
 using UnityEngine;
 
-// Example target: changes color when looked at, pushes away when clicked.
+/// <summary>
+/// Example raycast target: changes color while looked at, gets pushed when clicked.
+/// It only knows about itself; it never checks what other components the object has.
+/// </summary>
 [RequireComponent(typeof(Renderer))]
-public class RaycastHighlight : MonoBehaviour, IRaycastTarget
+public sealed class RaycastHighlight : MonoBehaviour, IRaycastTarget
 {
     [SerializeField] private Color highlightColor = Color.yellow;
-    [SerializeField] private float pushForce = 5f;
+    [SerializeField, Min(0f)] private float pushForce = 5f;
 
     private Renderer rend;
     private Color originalColor;
@@ -22,12 +25,8 @@ public class RaycastHighlight : MonoBehaviour, IRaycastTarget
 
     public void OnRaycastInteract(RaycastHit hit)
     {
-        // If it has a Rigidbody, push it in the direction the ray was travelling
+        // Push away from the viewer if this object has a Rigidbody
         if (TryGetComponent(out Rigidbody rb))
             rb.AddForceAtPosition(-hit.normal * pushForce, hit.point, ForceMode.Impulse);
-
-        // If it's a pendulum, give it a swing
-        if (TryGetComponent(out PendulumScript pendulum))
-            pendulum.Push(pendulum.initialAngle);
     }
 }
