@@ -87,6 +87,9 @@ Do not touch: `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.slnx
 - `RaycastHighlight`: example target; changes color when looked at, gets pushed when clicked.
 - `Pendulum` (abstract, implements `IRaycastTarget`): owns configuration (`stringLength`, `releaseAngle`, `damping`), shared state (`Angle`, `AngularVelocity`, step-counted `SimulatedTime`), the visual update, period measurement (`MeasuredPeriod` vs `TheoreticalPeriod`) and click interaction (`Release()` / `Reset()`). Subclasses implement only `Step(double dt)`. Subclasses must **not** define `FixedUpdate`. Kept deliberately small for learning; add hooks only when a subclass needs them.
 - `MathPendulum : Pendulum` (sealed): reference implementation, semi-implicit Euler in `double` with configurable sub-steps.
+- `DecorativeCloth` (sealed): wraps Unity `Cloth` for decorative wobble (tablecloth, curtain). Not deterministic; never put it on anything that is measured (string, bob).
+- `SoftBodyPhysics`: the user's own earlier Cloth experiment, kept for reference. `DecorativeCloth` is the reviewed replacement; do not use both on the same object.
+- `RandomColor` (sealed): random color per renderer via `MaterialPropertyBlock` (`_BaseColor`, falls back to `_Color`, plus `_EmissionColor` keeping the original HDR intensity); never modifies or instantiates materials, keeps original alpha. Emission only works if the material already has the `_EMISSION` keyword on (a property block cannot enable keywords). `Randomize()` / `RestoreOriginal()`.
 - Planned: `PhysicsPendulum : Pendulum` using `Rigidbody` + `HingeJoint` with the determinism fixes.
 
 ## OOP principles (mandatory)
@@ -130,6 +133,7 @@ All code in this project **must** follow the four pillars of OOP. When writing o
 ## Code conventions
 
 - All code, identifiers, comments and commit messages are written in **English**.
+- Do **not** add XML doc comments (`/// <summary>`). Use short `//` comments only where the code is not obvious.
 - `.cs` file name **must match** the `MonoBehaviour` class name.
 - Naming: `PascalCase` for classes, methods, properties; `camelCase` for fields and locals.
 - Cache components in `Awake` / `Start`; avoid allocations in `Update` (reuse buffers, use `NonAlloc` APIs).
