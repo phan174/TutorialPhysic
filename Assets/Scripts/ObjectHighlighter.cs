@@ -10,6 +10,7 @@ public sealed class ObjectHighlighter
     private sealed class Slot
     {
         public Renderer Renderer;
+        public Material Material;
         public int MaterialIndex;
         public int ColorId;
         public readonly MaterialPropertyBlock Saved = new MaterialPropertyBlock();
@@ -18,12 +19,15 @@ public sealed class ObjectHighlighter
     private readonly List<Slot> slots = new List<Slot>();
     private readonly MaterialPropertyBlock block = new MaterialPropertyBlock();
     private readonly Color color;
+    private readonly float strength;
 
     public bool IsOn { get; private set; }
 
-    public ObjectHighlighter(GameObject target, Color color)
+    // strength: 0 = no change, 1 = fully replaced by the highlight color.
+    public ObjectHighlighter(GameObject target, Color color, float strength)
     {
         this.color = color;
+        this.strength = Mathf.Clamp01(strength);
 
         foreach (Renderer renderer in target.GetComponentsInChildren<Renderer>())
         {
@@ -32,7 +36,7 @@ public sealed class ObjectHighlighter
             {
                 int colorId = FindColorProperty(materials[i]);
                 if (colorId != -1)
-                    slots.Add(new Slot { Renderer = renderer, MaterialIndex = i, ColorId = colorId });
+                    slots.Add(new Slot { Renderer = renderer, Material = materials[i], MaterialIndex = i, ColorId = colorId });
             }
         }
     }
@@ -45,8 +49,16 @@ public sealed class ObjectHighlighter
         foreach (Slot slot in slots)
         {
             slot.Renderer.GetPropertyBlock(slot.Saved, slot.MaterialIndex);
+
+            Color current = slot.Saved.HasColor(slot.ColorId)
+                ? slot.Saved.GetColor(slot.ColorId)
+                : slot.Material.GetColor(slot.ColorId);
+
+            Color tinted = Color.Lerp(current, color, strength);
+            tinted.a = current.a;
+
             slot.Renderer.GetPropertyBlock(block, slot.MaterialIndex);
-            block.SetColor(slot.ColorId, color);
+            block.SetColor(slot.ColorId, tinted);
             slot.Renderer.SetPropertyBlock(block, slot.MaterialIndex);
         }
 

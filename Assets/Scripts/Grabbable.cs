@@ -11,6 +11,8 @@ public sealed class Grabbable : MonoBehaviour, IRaycastTarget
 
     [Header("Highlight")]
     [SerializeField] private Color highlightColor = Color.yellow;
+    [Tooltip("0 = no tint, 1 = solid highlight color.")]
+    [SerializeField, Range(0f, 1f)] private float highlightStrength = 0.3f;
 
     private Rigidbody rb;
     private Collider[] colliders;
@@ -28,7 +30,7 @@ public sealed class Grabbable : MonoBehaviour, IRaycastTarget
     {
         rb = GetComponent<Rigidbody>();
         colliders = GetComponentsInChildren<Collider>();
-        highlighter = new ObjectHighlighter(gameObject, highlightColor);
+        highlighter = new ObjectHighlighter(gameObject, highlightColor, highlightStrength);
     }
 
     private void FixedUpdate()

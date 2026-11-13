@@ -1193,11 +1193,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 283682096}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b87d6d08221e0a429cc99992832c593, type: 3}
+  m_Script: {fileID: 11500000, guid: be341564df381004faed01a4d3eb5e7c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RaycastHighlight
-  highlightColor: {r: 0.05701037, g: 1, b: 0.015686274, a: 1}
-  pushForce: 100
+  m_EditorClassIdentifier: Assembly-CSharp::Grabbable
+  followStrength: 0.5
+  maxSpeed: 15
+  highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  highlightStrength: 0.3
 --- !u!1 &296126037
 GameObject:
   m_ObjectHideFlags: 0
@@ -2466,12 +2468,13 @@ GameObject:
   - component: {fileID: 446696436}
   - component: {fileID: 446696435}
   - component: {fileID: 446696438}
-  - component: {fileID: 446696442}
   - component: {fileID: 446696441}
   - component: {fileID: 446696443}
-  - component: {fileID: 446696444}
   - component: {fileID: 446696446}
   - component: {fileID: 446696445}
+  - component: {fileID: 446696447}
+  - component: {fileID: 446696444}
+  - component: {fileID: 446696448}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2674,29 +2677,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!136 &446696442
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 446696433}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &446696443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2733,7 +2713,6 @@ MonoBehaviour:
     m_Bits: 4294967295
   triggerInteraction: 1
   maxHits: 10
-  interactActionName: Attack
   drawDebugRay: 1
 --- !u!114 &446696445
 MonoBehaviour:
@@ -2765,6 +2744,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFootsteps
   footstepClip: {fileID: 8300000, guid: 9bd6dd8f9d5eb5244bade3c7c62b39dd, type: 3}
   minMoveSpeed: 0.1
+--- !u!114 &446696447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446696433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Keyboard&Mouse
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 330585545}
+--- !u!114 &446696448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446696433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7065530f80a34b644beac1ac09b03ac8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHand
+  holdDistance: 1.5
+  maxStretch: 2
 --- !u!1 &531974566
 GameObject:
   m_ObjectHideFlags: 0
@@ -5388,9 +5411,9 @@ GameObject:
   - component: {fileID: 1366417093}
   - component: {fileID: 1366417092}
   - component: {fileID: 1366417091}
-  - component: {fileID: 1366417090}
   - component: {fileID: 1366417089}
   - component: {fileID: 1366417088}
+  - component: {fileID: 1366417094}
   m_Layer: 0
   m_Name: Ball Soft Body
   m_TagString: Untagged
@@ -5488,20 +5511,6 @@ SkinnedMeshRenderer:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0.5, y: 0.5, z: 0.5}
   m_DirtyAABB: 0
---- !u!114 &1366417090
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1366417086}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b87d6d08221e0a429cc99992832c593, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RaycastHighlight
-  highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  pushForce: 100
 --- !u!54 &1366417091
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5558,6 +5567,22 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1366417086}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1366417094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1366417086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be341564df381004faed01a4d3eb5e7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Grabbable
+  followStrength: 0.5
+  maxSpeed: 15
+  highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  highlightStrength: 0.3
 --- !u!1 &1374613334
 GameObject:
   m_ObjectHideFlags: 0
@@ -5746,11 +5771,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1385753070}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b87d6d08221e0a429cc99992832c593, type: 3}
+  m_Script: {fileID: 11500000, guid: be341564df381004faed01a4d3eb5e7c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RaycastHighlight
+  m_EditorClassIdentifier: Assembly-CSharp::Grabbable
+  followStrength: 0.5
+  maxSpeed: 15
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  pushForce: 100
+  highlightStrength: 0.3
 --- !u!1 &1451222009
 GameObject:
   m_ObjectHideFlags: 0
@@ -7093,11 +7120,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1587049311}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3b87d6d08221e0a429cc99992832c593, type: 3}
+  m_Script: {fileID: 11500000, guid: be341564df381004faed01a4d3eb5e7c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RaycastHighlight
+  m_EditorClassIdentifier: Assembly-CSharp::Grabbable
+  followStrength: 0.5
+  maxSpeed: 15
   highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  pushForce: 100
+  highlightStrength: 0.3
 --- !u!1 &1605515179
 GameObject:
   m_ObjectHideFlags: 0
