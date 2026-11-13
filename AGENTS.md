@@ -82,7 +82,7 @@ Do not touch: `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.slnx
 
 ## Existing systems
 
-- `PlayerController` (`Player.cs`): walk, sprint, jump, mouse look. Note: class name differs from file name.
+- `PlayerController` (sealed): walk, sprint, jump, mouse look. All input goes through project-wide actions (`Move`, `Look`, `Sprint`, `Jump`); jump is polled with `WasPressedThisFrame()` (no event subscriptions to clean up).
 - `RaycastSystem`: casts a ray from the camera center using `Physics.RaycastNonAlloc` and calls the `IRaycastTarget` interface (`OnRaycastEnter` / `OnRaycastExit` / `OnRaycastInteract`).
 - `RaycastHighlight`: example target; changes color when looked at, gets pushed when clicked.
 - `Pendulum` (abstract, implements `IRaycastTarget`): owns configuration (`stringLength`, `releaseAngle`, `damping`), shared state (`Angle`, `AngularVelocity`, step-counted `SimulatedTime`), the visual update, period measurement (`MeasuredPeriod` vs `TheoreticalPeriod`) and click interaction (`Release()` / `Reset()`). Subclasses implement only `Step(double dt)`. Subclasses must **not** define `FixedUpdate`. Kept deliberately small for learning; add hooks only when a subclass needs them.
@@ -131,7 +131,7 @@ All code in this project **must** follow the four pillars of OOP. When writing o
 - In Unity, override `MonoBehaviour` lifecycle methods in subclasses by making the base one `protected virtual` (e.g. `protected virtual void Awake()`) and calling `base.Awake()` in the override.
 
 ### Known violations to fix
-- `Player.cs`: class is named `PlayerController`, so the file name does not match the class name.
+- None currently.
 
 ## Code conventions
 

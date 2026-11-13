@@ -1336,7 +1336,7 @@ AudioSource:
   m_GameObject: {fileID: 310140179}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -6018725336649045301, guid: 0eea5b4c043134c4fa8edca0ca08031a, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
@@ -2224,7 +2224,7 @@ Light:
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
-  m_ColorTemperature: 5000
+  m_ColorTemperature: 3858
   m_UseColorTemperature: 1
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
@@ -2470,6 +2470,8 @@ GameObject:
   - component: {fileID: 446696441}
   - component: {fileID: 446696443}
   - component: {fileID: 446696444}
+  - component: {fileID: 446696446}
+  - component: {fileID: 446696445}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2707,12 +2709,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 709989f942eef5c44843032695162c4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  WalkSpeed: 5
+  walkSpeed: 5
   runningSpeed: 10
   jumpForce: 8
   gravity: 20
-  LookSensitivity: 0.2
-  LookAngleLimit: 90
+  lookSensitivity: 0.2
+  lookAngleLimit: 90
 --- !u!114 &446696444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2733,6 +2735,36 @@ MonoBehaviour:
   maxHits: 10
   interactActionName: Attack
   drawDebugRay: 1
+--- !u!114 &446696445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446696433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 216233aa3a003d24399cec04af2632cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLandingSound
+  audioManager: {fileID: 1605515180}
+  landingClip: {fileID: 8300000, guid: 346541c0c5085b648a1d727fa7e09962, type: 3}
+  volume: 0.6
+  minAirTime: 0.1
+--- !u!114 &446696446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446696433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7397aeb8d8fcde4d8d5ebf15c708784, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerFootsteps
+  footstepClip: {fileID: 8300000, guid: 9bd6dd8f9d5eb5244bade3c7c62b39dd, type: 3}
+  minMoveSpeed: 0.1
 --- !u!1 &531974566
 GameObject:
   m_ObjectHideFlags: 0
@@ -7098,7 +7130,6 @@ MonoBehaviour:
   musicSource: {fileID: 310140180}
   sfxSource: {fileID: 2021938013}
   backgroundMusic: {fileID: 8300000, guid: d88b96b0e594dd844b401cfe52446b9c, type: 3}
-  walkingSound: {fileID: 8300000, guid: 346541c0c5085b648a1d727fa7e09962, type: 3}
 --- !u!4 &1605515181
 Transform:
   m_ObjectHideFlags: 0
@@ -8406,7 +8437,7 @@ AudioSource:
   m_GameObject: {fileID: 2021938012}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 6895341691697245103, guid: 0eea5b4c043134c4fa8edca0ca08031a, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
