@@ -1,23 +1,30 @@
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour
-{   
+public sealed class AudioManager : MonoBehaviour
+{
     [Header("Audio Sources")]
-    [SerializeField]  AudioSource musicSource;
-    [SerializeField]  AudioSource sfxSource;
+    [SerializeField] private AudioSource musicSource;
+    [SerializeField] private AudioSource sfxSource;
 
     [Header("Audio Clips")]
-    public AudioClip backgroundMusic;
-    public AudioClip walkingSound;
+    [SerializeField] private AudioClip backgroundMusic;
 
     private void Start()
     {
+        if (musicSource == null || backgroundMusic == null)
+            return;
+
         musicSource.clip = backgroundMusic;
+        musicSource.loop = true;
         musicSource.Play();
     }
 
-    public void PlaySFX(AudioClip clip)
+    // Short one-shot sounds only (clicks, impacts, landing). They overlap and cannot be stopped.
+    public void PlaySFX(AudioClip clip, float volume = 1f)
     {
-        sfxSource.PlayOneShot(clip);
+        if (sfxSource == null || clip == null)
+            return;
+
+        sfxSource.PlayOneShot(clip, Mathf.Clamp01(volume));
     }
 }

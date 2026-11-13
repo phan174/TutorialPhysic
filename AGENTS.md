@@ -90,6 +90,9 @@ Do not touch: `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.slnx
 - `DecorativeCloth` (sealed): wraps Unity `Cloth` for decorative wobble (tablecloth, curtain). Not deterministic; never put it on anything that is measured (string, bob).
 - `SoftBodyPhysics`: the user's own earlier Cloth experiment, kept for reference. `DecorativeCloth` is the reviewed replacement; do not use both on the same object.
 - `RandomColor` (sealed): random color per renderer via `MaterialPropertyBlock` (`_BaseColor`, falls back to `_Color`, plus `_EmissionColor` keeping the original HDR intensity); never modifies or instantiates materials, keeps original alpha. Emission only works if the material already has the `_EMISSION` keyword on (a property block cannot enable keywords). `Randomize()` / `RestoreOriginal()`.
+- `AudioManager` (sealed): looping background music + 2D one-shot SFX via `PlaySFX(clip, volume)`. Other scripts get it through a `[SerializeField] private AudioManager` reference (no singleton). Not used for footsteps (`PlayOneShot` cannot be stopped) or for positional 3D sounds.
+- `PlayerLandingSound` (sealed, on the Player): plays a landing clip through `AudioManager` when the player touches the ground after at least `minAirTime` in the air.
+- `PlayerFootsteps` (sealed, on the Player): loops `Footsteps.mp3` on its own `AudioSource` while grounded and moving (reads `CharacterController.velocity`); does not touch `PlayerController`. Not synced to steps yet; a per-step version would need short single-step clips.
 - Planned: `PhysicsPendulum : Pendulum` using `Rigidbody` + `HingeJoint` with the determinism fixes.
 
 ## OOP principles (mandatory)
