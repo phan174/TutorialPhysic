@@ -1,28 +1,24 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Implement this on any object you want to react to the raycast.
+
 public interface IRaycastTarget
 {
-    void OnRaycastEnter();               // crosshair started pointing at it
-    void OnRaycastExit();                // crosshair stopped pointing at it
-    void OnRaycastInteract(RaycastHit hit); // player pressed the interact button on it
+    void OnRaycastEnter();              
+    void OnRaycastExit();                
+    void OnRaycastInteract(RaycastHit hit, PlayerHand hand);
 }
 
-// Attach to the player (or the camera). Casts a ray from the center of the camera every frame.
+[RequireComponent(typeof(PlayerHand))]
 public class RaycastSystem : MonoBehaviour
 {
     [Header("Ray Settings")]
     [SerializeField] private float maxDistance = 5f;
-    [SerializeField] private LayerMask hitLayers = ~0; // Everything by default
+    [SerializeField] private LayerMask hitLayers = ~0; 
     [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
 
     [Tooltip("Max number of hits the ray can store per frame. Extra hits are dropped.")]
     [SerializeField] private int maxHits = 10;
-
-    [Header("Input")]
-    [Tooltip("Name of the action in the project-wide Input Actions asset")]
-    [SerializeField] private string interactActionName = "Attack";
 
     [Header("Debug")]
     [SerializeField] private bool drawDebugRay = true;
@@ -31,8 +27,9 @@ public class RaycastSystem : MonoBehaviour
     public RaycastHit CurrentHit { get; private set; }
 
     private Camera rayCamera;
-    private InputAction interactInput;
+    private PlayerHand hand;
     private IRaycastTarget currentTarget;
+    private bool interactRequested;
 
     // Buffer created once and reused every frame
     private RaycastHit[] hitBuffer;
@@ -45,27 +42,41 @@ public class RaycastSystem : MonoBehaviour
     private void Awake()
     {
         hitBuffer = new RaycastHit[maxHits];
+        hand = GetComponent<PlayerHand>();
     }
 
     private void Start()
     {
         rayCamera = GetComponentInChildren<Camera>();
         if (rayCamera == null) rayCamera = Camera.main;
-
-        interactInput = InputSystem.actions.FindAction(interactActionName);
-        if (interactInput == null)
-            Debug.LogWarning($"RaycastSystem: Input action '{interactActionName}' not found.");
     }
+
+    private void OnAttack(InputValue value) => interactRequested = true;
 
     private void Update()
     {
         CastRay();
 
-        if (interactInput != null && interactInput.WasPressedThisFrame() && HasHit)
+        if (interactRequested)
         {
-            Debug.Log($"Raycast hit: {CurrentHit.collider.name} at {CurrentHit.point}");
-            currentTarget?.OnRaycastInteract(CurrentHit);
+            if (hand.IsHolding)
+            {
+                // While holding something, a click always means "put it down".
+                Debug.Log($"Click: dropped {hand.Held.name}");
+                hand.Drop();
+            }
+            else if (HasHit)
+            {
+                Debug.Log($"Click: hit {CurrentHit.collider.name} at {CurrentHit.point}");
+                currentTarget?.OnRaycastInteract(CurrentHit, hand);
+            }
+            else
+            {
+                Debug.Log($"Click: nothing within {maxDistance} m");
+            }
         }
+
+        interactRequested = false;
     }
 
     private void CastRay()
@@ -74,13 +85,11 @@ public class RaycastSystem : MonoBehaviour
 
         hitCount = Physics.RaycastNonAlloc(ray, hitBuffer, maxDistance, hitLayers, triggerInteraction);
 
-        // The results are NOT sorted, so find the closest one ourselves
         HasHit = false;
         RaycastHit hit = default;
         float closest = float.MaxValue;
         for (int i = 0; i < hitCount; i++)
         {
-            // Skip our own colliders (e.g. the player's CharacterController)
             if (hitBuffer[i].collider.transform.IsChildOf(transform)) continue;
 
             if (hitBuffer[i].distance < closest)
@@ -94,7 +103,6 @@ public class RaycastSystem : MonoBehaviour
 
         IRaycastTarget newTarget = HasHit ? hit.collider.GetComponentInParent<IRaycastTarget>() : null;
 
-        // Handle enter / exit when the target changes
         if (newTarget != currentTarget)
         {
             currentTarget?.OnRaycastExit();

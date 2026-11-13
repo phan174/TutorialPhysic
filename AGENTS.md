@@ -62,8 +62,11 @@ Verification: provide a way to log state (time, angle, measured period) so two r
 
 - **Unity:** 6000.3.15f1 (Unity 6)
 - **Render pipeline:** URP 17.3.0, with Shader Graph (`Assets/Materials/Shader_graph`)
-- **Input:** new Input System 1.19.0. Read input via `InputSystem.actions.FindAction("...")` (project-wide actions in `Assets/InputSystem_Actions.inputactions`).
-  - Available actions include `Move`, `Look`, `Jump`, `Sprint`, `Attack`.
+- **Input:** new Input System 1.19.0, through a **`PlayerInput` component on the Player** (Behavior = Send Messages, Actions = `Assets/InputSystem_Actions.inputactions`, Default Map = `Player`).
+  - Scripts on the Player receive input as `private void On<ActionName>(InputValue value)`; the method name must match the action name exactly (no compile-time check).
+  - Do not use `InputSystem.actions` / `FindAction` or `Mouse.current` in gameplay scripts.
+  - Available actions include `Move`, `Look`, `Jump`, `Sprint` (needs the Press And Release interaction), `Attack`.
+  - Button messages fire once per press: store a flag and clear it after the frame it was used.
 - **Physics:** 3D (`Rigidbody`, `CharacterController`, Joints)
 - **IDE:** VS Code (with the Claude Code extension)
 
@@ -82,9 +85,11 @@ Do not touch: `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.slnx
 
 ## Existing systems
 
-- `PlayerController` (sealed): walk, sprint, jump, mouse look. All input goes through project-wide actions (`Move`, `Look`, `Sprint`, `Jump`); jump is polled with `WasPressedThisFrame()` (no event subscriptions to clean up).
-- `RaycastSystem`: casts a ray from the camera center using `Physics.RaycastNonAlloc` and calls the `IRaycastTarget` interface (`OnRaycastEnter` / `OnRaycastExit` / `OnRaycastInteract`).
-- `RaycastHighlight`: example target; changes color when looked at, gets pushed when clicked.
+- `PlayerController` (sealed): walk, sprint, jump, mouse look via `OnMove` / `OnLook` / `OnSprint` / `OnJump` messages from `PlayerInput`.
+- `PlayerHand` (sealed, on the Player): holds at most one `Grabbable` at a `HoldPoint` it creates under the camera; `Grab()` / `Drop()`, auto-drops when the object is stuck farther than `maxStretch`; ignores collisions between the held object and the player's `CharacterController`.
+- `Grabbable` (sealed, `IRaycastTarget`, requires a non-kinematic `Rigidbody`): highlights when looked at (not while held); click to pick up; while held it follows the hand by setting `linearVelocity` (still collides with the world), gravity off, keeps the rotation it had when grabbed. Never put it on the pendulum bob (the bob is driven by the simulation).
+- `ObjectHighlighter` (plain C# class, not a component): tints all renderers of an object via `MaterialPropertyBlock` and restores the previous blocks exactly (works together with `RandomColor`). Reuse it for any other highlight.
+- `RaycastSystem`: interact via the `OnAttack` message from `PlayerInput` (left mouse button). Click while holding → `PlayerHand.Drop()`; otherwise → `IRaycastTarget.OnRaycastInteract(hit, hand)`. Requires `PlayerHand`. Casts a ray from the camera center using `Physics.RaycastNonAlloc` and calls the `IRaycastTarget` interface (`OnRaycastEnter` / `OnRaycastExit` / `OnRaycastInteract`).
 - `Pendulum` (abstract, implements `IRaycastTarget`): owns configuration (`stringLength`, `releaseAngle`, `damping`), shared state (`Angle`, `AngularVelocity`, step-counted `SimulatedTime`), the visual update, period measurement (`MeasuredPeriod` vs `TheoreticalPeriod`) and click interaction (`Release()` / `Reset()`). Subclasses implement only `Step(double dt)`. Subclasses must **not** define `FixedUpdate`. Kept deliberately small for learning; add hooks only when a subclass needs them.
 - `MathPendulum : Pendulum` (sealed): reference implementation, semi-implicit Euler in `double` with configurable sub-steps.
 - `DecorativeCloth` (sealed): wraps Unity `Cloth` for decorative wobble (tablecloth, curtain). Not deterministic; never put it on anything that is measured (string, bob).
@@ -136,7 +141,7 @@ All code in this project **must** follow the four pillars of OOP. When writing o
 ## Code conventions
 
 - All code, identifiers, comments and commit messages are written in **English**.
-- Do **not** add XML doc comments (`/// <summary>`). Use short `//` comments only where the code is not obvious.
+- **Comments:** by default write none. Never use XML doc comments (`/// <summary>`). Only add a comment when the code alone cannot explain *why*; then keep it to one short, clear `//` line. Do not comment what the code obviously does, and do not add section-divider comments.
 - `.cs` file name **must match** the `MonoBehaviour` class name.
 - Naming: `PascalCase` for classes, methods, properties; `camelCase` for fields and locals.
 - Cache components in `Awake` / `Start`; avoid allocations in `Update` (reuse buffers, use `NonAlloc` APIs).

@@ -3,9 +3,9 @@ using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(PlayerInput))]
 public sealed class PlayerController : MonoBehaviour
 {
-   
     private const float GroundedStickForce = -2f;
 
     [Header("Movement")]
@@ -21,10 +21,10 @@ public sealed class PlayerController : MonoBehaviour
     private CharacterController characterController;
     private Transform cameraTransform;
 
-    private InputAction moveAction;
-    private InputAction lookAction;
-    private InputAction sprintAction;
-    private InputAction jumpAction;
+    private Vector2 moveInput;
+    private Vector2 lookInput;
+    private bool isSprinting;
+    private bool jumpRequested;
 
     private float verticalVelocity;
     private float pitch;   // camera up/down angle
@@ -33,11 +33,6 @@ public sealed class PlayerController : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         cameraTransform = GetComponentInChildren<Camera>().transform;
-
-        moveAction = FindAction("Move");
-        lookAction = FindAction("Look");
-        sprintAction = FindAction("Sprint");
-        jumpAction = FindAction("Jump");
     }
 
     private void Start()
@@ -48,14 +43,24 @@ public sealed class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        Look(lookAction.ReadValue<Vector2>());
-        Move(moveAction.ReadValue<Vector2>());
+        Look();
+        Move();
     }
 
-    private void Move(Vector2 input)
+    private void OnMove(InputValue value) => moveInput = value.Get<Vector2>();
+
+    // Mouse delta can arrive several times per frame, so add them up; Look() clears it after use.
+    private void OnLook(InputValue value) => lookInput += value.Get<Vector2>();
+
+    // Needs the "Press And Release" interaction on the Sprint action, otherwise releasing Shift is never reported.
+    private void OnSprint(InputValue value) => isSprinting = value.isPressed;
+
+    private void OnJump(InputValue value) => jumpRequested = true;
+
+    private void Move()
     {
-        float speed = sprintAction.IsPressed() ? runningSpeed : walkSpeed;
-        Vector3 horizontal = (transform.forward * input.y + transform.right * input.x) * speed;
+        float speed = isSprinting ? runningSpeed : walkSpeed;
+        Vector3 horizontal = (transform.forward * moveInput.y + transform.right * moveInput.x) * speed;
 
         UpdateVerticalVelocity();
 
@@ -66,34 +71,20 @@ public sealed class PlayerController : MonoBehaviour
     private void UpdateVerticalVelocity()
     {
         if (characterController.isGrounded)
-        {
-            verticalVelocity = jumpAction.WasPressedThisFrame() ? jumpForce : GroundedStickForce;
-        }
+            verticalVelocity = jumpRequested ? jumpForce : GroundedStickForce;
         else
-        {
             verticalVelocity -= gravity * Time.deltaTime;
-        }
+
+        jumpRequested = false;  
     }
 
-    // Mouse delta is already "per frame", so it is not multiplied by Time.deltaTime.
-    private void Look(Vector2 delta)
+    private void Look()
     {
-        transform.Rotate(0f, delta.x * lookSensitivity, 0f);
+        transform.Rotate(0f, lookInput.x * lookSensitivity, 0f);
 
-        pitch = Mathf.Clamp(pitch - delta.y * lookSensitivity, -lookAngleLimit, lookAngleLimit);
+        pitch = Mathf.Clamp(pitch - lookInput.y * lookSensitivity, -lookAngleLimit, lookAngleLimit);
         cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
-    }
 
-    private InputAction FindAction(string actionName)
-    {
-        InputAction action = InputSystem.actions.FindAction(actionName);
-
-        if (action == null)
-        {
-            Debug.LogError($"{name}: input action '{actionName}' not found in the project-wide Input Actions.", this);
-            enabled = false;   // stop Update from crashing every frame
-        }
-
-        return action;
+        lookInput = Vector2.zero;
     }
 }
