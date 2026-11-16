@@ -65,7 +65,7 @@ Verification: provide a way to log state (time, angle, measured period) so two r
 - **Input:** new Input System 1.19.0, through a **`PlayerInput` component on the Player** (Behavior = Send Messages, Actions = `Assets/InputSystem_Actions.inputactions`, Default Map = `Player`).
   - Scripts on the Player receive input as `private void On<ActionName>(InputValue value)`; the method name must match the action name exactly (no compile-time check).
   - Do not use `InputSystem.actions` / `FindAction` or `Mouse.current` in gameplay scripts.
-  - Available actions include `Move`, `Look`, `Jump`, `Sprint` (needs the Press And Release interaction), `Attack`.
+  - Available actions include `Move`, `Look`, `Jump`, `Sprint` (needs the Press And Release interaction), `Attack`, `ToggleMenu` (Tab, in both `Player` and `UI` maps).
   - Button messages fire once per press: store a flag and clear it after the frame it was used.
 - **Physics:** 3D (`Rigidbody`, `CharacterController`, Joints)
 - **IDE:** VS Code (with the Claude Code extension)
@@ -90,7 +90,12 @@ Do not touch: `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.slnx
 - `Grabbable` (sealed, `IRaycastTarget`, requires a non-kinematic `Rigidbody`): highlights when looked at (not while held); click to pick up; while held it follows the hand by setting `linearVelocity` (still collides with the world), gravity off, keeps the rotation it had when grabbed. Never put it on the pendulum bob (the bob is driven by the simulation).
 - `ObjectHighlighter` (plain C# class, not a component): tints all renderers of an object via `MaterialPropertyBlock` and restores the previous blocks exactly (works together with `RandomColor`). Reuse it for any other highlight.
 - `RaycastSystem`: interact via the `OnAttack` message from `PlayerInput` (left mouse button). Click while holding → `PlayerHand.Drop()`; otherwise → `IRaycastTarget.OnRaycastInteract(hit, hand)`. Requires `PlayerHand`. Casts a ray from the camera center using `Physics.RaycastNonAlloc` and calls the `IRaycastTarget` interface (`OnRaycastEnter` / `OnRaycastExit` / `OnRaycastInteract`).
-- `Pendulum` (abstract, implements `IRaycastTarget`): owns configuration (`stringLength`, `releaseAngle`, `damping`), shared state (`Angle`, `AngularVelocity`, step-counted `SimulatedTime`), the visual update, period measurement (`MeasuredPeriod` vs `TheoreticalPeriod`) and click interaction (`Release()` / `Reset()`). Subclasses implement only `Step(double dt)`. Subclasses must **not** define `FixedUpdate`. Kept deliberately small for learning; add hooks only when a subclass needs them.
+- `Pendulum` (abstract, implements `IRaycastTarget`): owns configuration (`stringLength`, `releaseAngle`, `damping`), shared state (`Angle`, `AngularVelocity`, step-counted `SimulatedTime`), the visual update, period measurement (`MeasuredPeriod` vs `TheoreticalPeriod`) and click interaction (`Release()` / `ResetToStart()`). Subclasses implement only `Step(double dt)`. Subclasses must **not** define `FixedUpdate`. Kept deliberately small for learning; add hooks only when a subclass needs them.
+- `Pendulum` runtime API: `ReleaseAngle` (runtime value, initialised from the Inspector `releaseAngle`, which is never overwritten), `SetReleaseAngle(deg)` (clamped to `MinReleaseAngle`–`MaxReleaseAngle`, restarts), `Release()`, `ResetToStart()` (do not name it `Reset`: Unity calls `Reset()` itself in the Editor).
+- `Pendulum` events: `PeriodMeasured(double)`, `Released`, `ResetDone`. UI/audio listen instead of polling; subscribe in `OnEnable`, unsubscribe in `OnDisable`.
+- `PendulumHud` (sealed, on a Screen Space TextMeshPro label): shows `L`, `θ0`, theoretical `T` and last measured `T` (`--` after a reset); event-driven, no per-frame work.
+- `PendulumControlPanel` (sealed, on the UI panel): angle `Slider` → `SetReleaseAngle`, Release / Reset `Button`s; listeners added in `OnEnable`, removed in `OnDisable`. Slider and label are synced from `ResetDone` (never read pendulum state in `OnEnable` only: it may run before `Pendulum.Awake`).
+- `CursorModeToggle` (sealed, on the Player): `OnToggleMenu` (Tab) switches `PlayerInput` between the `Player` and `UI` action maps, unlocks/locks the cursor and shows/hides an optional `uiRoot`. The `ToggleMenu` action must exist in **both** maps.
 - `MathPendulum : Pendulum` (sealed): reference implementation, semi-implicit Euler in `double` with configurable sub-steps.
 - `DecorativeCloth` (sealed): wraps Unity `Cloth` for decorative wobble (tablecloth, curtain). Not deterministic; never put it on anything that is measured (string, bob).
 - `SoftBodyPhysics`: the user's own earlier Cloth experiment, kept for reference. `DecorativeCloth` is the reviewed replacement; do not use both on the same object.
@@ -162,3 +167,6 @@ All code in this project **must** follow the four pillars of OOP. When writing o
 ## Communication
 
 - Reply to the user in **Vietnamese**. Code, comments and identifiers stay in English.
+- **Never change code without approval.** Present a concrete plan (files, classes, methods,
+  Editor steps) and wait for the user's explicit OK. Approval covers only that plan.
+- In-game UI text is in **English** (default TextMeshPro font is enough).

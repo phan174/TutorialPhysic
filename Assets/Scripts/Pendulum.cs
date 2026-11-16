@@ -3,12 +3,14 @@ using UnityEngine;
 
 public abstract class Pendulum : MonoBehaviour, IRaycastTarget
 {
+    public const float MinReleaseAngle = 1f;
+    public const float MaxReleaseAngle = 60f;
 
     [Tooltip("String length L in meters.")]
     [SerializeField, Min(0.1f)] private float stringLength = 1f;
 
-    [Tooltip("Angle the bob is pulled to before release, in degrees. Keep it small (<= 15).")]
-    [SerializeField, Range(1f, 60f)] private float releaseAngle = 10f;
+    [Tooltip("Default release angle in degrees. Keep it small (<= 15) for the small-angle case.")]
+    [SerializeField, Range(MinReleaseAngle, MaxReleaseAngle)] private float releaseAngle = 10f;
 
     [Tooltip("Damping b in 1/s. 0 = swings forever.")]
     [SerializeField, Min(0f)] private float damping = 0.05f;
@@ -24,6 +26,7 @@ public abstract class Pendulum : MonoBehaviour, IRaycastTarget
     private bool wasNegative;           // was the angle negative in the previous step?
 
     public bool IsSwinging { get; private set; }
+    public float ReleaseAngle { get; private set; }
     public float StringLength => stringLength;
     public float Damping => damping;
     public double Gravity => Physics.gravity.magnitude;
@@ -31,10 +34,14 @@ public abstract class Pendulum : MonoBehaviour, IRaycastTarget
     public double TheoreticalPeriod => 2.0 * Math.PI * Math.Sqrt(stringLength / Gravity);
     public double MeasuredPeriod { get; private set; }
 
+    public event Action<double> PeriodMeasured;
+    public event Action Released;
+    public event Action ResetDone;
 
     protected virtual void Awake()
     {
-        Reset();
+        ReleaseAngle = releaseAngle;
+        ResetToStart();
     }
 
     // Private on purpose: subclasses must NOT write their own FixedUpdate.
@@ -50,23 +57,35 @@ public abstract class Pendulum : MonoBehaviour, IRaycastTarget
         transform.localRotation = Quaternion.Euler((float)(Angle * Mathf.Rad2Deg), 0f, 0f);
     }
 
-    public void Reset()
+    public void ResetToStart()
     {
         IsSwinging = false;
         stepCount = 0;
         lastCrossingTime = -1.0;
         MeasuredPeriod = 0.0;
 
-        Angle = releaseAngle * Mathf.Deg2Rad;
+        Angle = ReleaseAngle * Mathf.Deg2Rad;
         AngularVelocity = 0.0;
         wasNegative = false;
 
-        transform.localRotation = Quaternion.Euler(releaseAngle, 0f, 0f);
+        transform.localRotation = Quaternion.Euler(ReleaseAngle, 0f, 0f);
+        ResetDone?.Invoke();
     }
 
     public void Release()
     {
+        if (IsSwinging)
+            return;
+
         IsSwinging = true;
+        Released?.Invoke();
+    }
+
+    // Changing the angle restarts the experiment from the new angle.
+    public void SetReleaseAngle(float degrees)
+    {
+        ReleaseAngle = Mathf.Clamp(degrees, MinReleaseAngle, MaxReleaseAngle);
+        ResetToStart();
     }
 
     public void OnRaycastEnter() { }
@@ -76,7 +95,7 @@ public abstract class Pendulum : MonoBehaviour, IRaycastTarget
     public void OnRaycastInteract(RaycastHit hit, PlayerHand hand)
     {
         if (IsSwinging)
-            Reset();
+            ResetToStart();
         else
             Release();
     }
@@ -96,6 +115,8 @@ public abstract class Pendulum : MonoBehaviour, IRaycastTarget
 
                 if (logPeriod)
                     Debug.Log($"{name} | t = {SimulatedTime:F2} s | measured T = {MeasuredPeriod:F3} s | theory T = {TheoreticalPeriod:F3} s");
+
+                PeriodMeasured?.Invoke(MeasuredPeriod);
             }
 
             lastCrossingTime = SimulatedTime;
