@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 16995157, guid: 63668874f61f5440c9d8cf7e9fbdd369, type: 3}
+  m_Script: {fileID: 16995157, guid: a811bde74b26b53498b4f6d872b09b6d, type: 3}
   m_Name: DOTweenSettings
   m_EditorClassIdentifier: DOTween.dll::DG.Tweening.Core.DOTweenSettings
   useSafeMode: 1
@@ -48,8 +48,9 @@ MonoBehaviour:
     textMeshProEnabled: 0
     tk2DEnabled: 0
     deAudioEnabled: 0
+    deAudioV2Enabled: 0
     deUnityExtendedEnabled: 0
     epoOutlineEnabled: 0
-  createASMDEF: 1
+  createASMDEF: 0
   showPlayingTweens: 0
   showPausedTweens: 0
