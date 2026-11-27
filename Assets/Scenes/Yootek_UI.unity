@@ -15658,18 +15658,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1172823050306867000, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
-      propertyPath: m_Color.a
-      value: 0.39215687
-      objectReference: {fileID: 0}
-    - target: {fileID: 2391073654777073751, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 1396
-      objectReference: {fileID: 0}
-    - target: {fileID: 2391073654777073751, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 940
-      objectReference: {fileID: 0}
     - target: {fileID: 2904629112618713046, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
       propertyPath: m_Name
       value: Main Canvas UI
@@ -15686,22 +15674,6 @@ PrefabInstance:
       propertyPath: m_fontStyle
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6726898464820629843, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6726898464820629843, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6726898464820629843, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6726898464820629843, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 8067121740546328439, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
       propertyPath: m_fontStyle
       value: 0
@@ -15712,10 +15684,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 406582906270124283, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 286438331}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6359893535918673419, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1838298435}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
 --- !u!1 &448709035
 GameObject:
@@ -60844,25 +60813,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1830788279}
   m_CullTransparentMesh: 1
---- !u!1 &1838298432 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6359893535918673419, guid: b6eeffadcb8327041b98d51965174b7d, type: 3}
-  m_PrefabInstance: {fileID: 444703433}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1838298435
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1838298432}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
-  m_Padding: {x: 0, y: 0, z: 0, w: 0}
-  m_Softness: {x: 0, y: 0}
 --- !u!1 &1843522384
 GameObject:
   m_ObjectHideFlags: 0
